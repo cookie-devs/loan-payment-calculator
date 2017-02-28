@@ -1,6 +1,6 @@
 {
-  "name": "kaurikk/loan",
-  "description": "[loan]",
+  "name": "kaurikk/loan-payment-calculator",
+  "description": "Loan payment calculation library",
   "type": "library",
   "license": "MIT",
   "authors": [
