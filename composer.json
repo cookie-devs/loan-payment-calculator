@@ -1,0 +1,30 @@
+{
+  "name": "kaurikk/loan",
+  "description": "[loan]",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Kauri Kont-Kontson"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Kauri\\Loan\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Kauri\\Loan\\Test\\": "tests/"
+    }
+  },
+  "require": {
+    "php": ">=7.1",
+    "kaurikk/loan-amount-calculator": "dev-master",
+    "kaurikk/loan-payment-schedule": "dev-master",
+    "kaurikk/loan-payment-period": "dev-master"
+  },
+  "require-dev": {
+    "phpunit/phpunit": ">=6.0"
+  }
+}
