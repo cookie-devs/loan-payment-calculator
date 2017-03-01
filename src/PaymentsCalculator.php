@@ -34,12 +34,12 @@ class PaymentsCalculator implements PaymentsCalculatorInterface
 
         foreach ($paymentPeriods->getPeriods() as $key => $period) {
             $ratePerPeriod = $paymentPeriods->getRatePerPeriod($period, $yearlyInterestRate, $calculationType);
-            $numberOfPeriods = $paymentPeriods->getNumberOfPeriods($period, $calculationType);
+            $numberOfPeriods = $paymentPeriods->getNumberOfRemainingPeriods($period, $calculationType);
 
             /**
              * Calculate payment amount
              */
-            $paymentAmount = $paymentAmountCalculator->getPaymentAmount($amountOfPrincipal, $ratePerPeriod,
+            $paymentAmount = $paymentAmountCalculator->getPaymentAmount($principalLeft, $ratePerPeriod,
                 $numberOfPeriods);
 
             /**
