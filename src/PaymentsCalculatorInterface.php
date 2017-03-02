@@ -12,23 +12,26 @@ interface PaymentsCalculatorInterface
 {
     /**
      * PaymentsCalculatorInterface constructor.
-     * @param PaymentPeriodsInterface $paymentPeriods
      * @param PaymentAmountCalculatorInterface $paymentAmountCalculator
      * @param InterestAmountCalculatorInterface $interestAmountCalculator
-     * @param float|int $amountOfPrincipal
-     * @param float|int $yearlyInterestRate
      */
     public function __construct(
-        PaymentPeriodsInterface $paymentPeriods,
         PaymentAmountCalculatorInterface $paymentAmountCalculator,
-        InterestAmountCalculatorInterface $interestAmountCalculator,
-        float $amountOfPrincipal,
-        float $yearlyInterestRate
+        InterestAmountCalculatorInterface $interestAmountCalculator
     );
 
     /**
+     * @param PaymentPeriodsInterface $paymentPeriods
+     * @param float $amountOfPrincipal
+     * @param float $yearlyInterestRate
+     * @param int $calculationMode
      * @return array
      */
-    public function getPayments(): array;
+    public function getPayments(
+        PaymentPeriodsInterface $paymentPeriods,
+        float $amountOfPrincipal,
+        float $yearlyInterestRate,
+        int $calculationMode
+    ): array;
 
 }

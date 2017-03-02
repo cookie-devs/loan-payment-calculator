@@ -25,23 +25,23 @@ class PaymentsCalculatorTest extends TestCase
      * @param $expectedPaymentAmount
      * @param PaymentAmountCalculatorInterface $paymentAmountCalculator
      */
-    public function testScheduler($noOfPayments, $principal, $interestRate, $expectedPaymentAmount, PaymentAmountCalculatorInterface $paymentAmountCalculator)
-    {
+    public function testScheduler(
+        $noOfPayments,
+        $principal,
+        $interestRate,
+        $expectedPaymentAmount,
+        PaymentAmountCalculatorInterface $paymentAmountCalculator
+    ) {
         $interestAmountCalculator = new InterestAmountCalculator;
 
         $config = new PaymentScheduleConfig($noOfPayments, new \DateTime(), 'P3D');
-
         $schedule = PaymentScheduleFactory::generate($config);
-
         $periods = PaymentPeriodsFactory::generate($schedule);
+        $paymentsCalculator = new PaymentsCalculator($paymentAmountCalculator, $interestAmountCalculator);
 
-        $paymentsCalculator = new PaymentsCalculator(
-            $periods,
-            $paymentAmountCalculator,
-            $interestAmountCalculator,
-            $principal, $interestRate);
+        $calculationMode = $periods::CALCULATION_MODE_AVERAGE;
 
-        $payments = $paymentsCalculator->getPayments();
+        $payments = $paymentsCalculator->getPayments($periods, $principal, $interestRate, $calculationMode);
         $firstPayment = current($payments);
         $this->assertEquals($expectedPaymentAmount, $firstPayment['payment']);
     }

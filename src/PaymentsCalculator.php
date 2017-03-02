@@ -8,44 +8,59 @@ namespace Kauri\Loan;
 class PaymentsCalculator implements PaymentsCalculatorInterface
 {
     /**
-     * @var array
+     * @var PaymentAmountCalculatorInterface
      */
-    private $payments = array();
+    private $paymentAmountCalculator;
+    /**
+     * @var InterestAmountCalculatorInterface
+     */
+    private $interestAmountCalculator;
 
     /**
      * PaymentsCalculator constructor.
-     * @param PaymentPeriodsInterface $paymentPeriods
      * @param PaymentAmountCalculatorInterface $paymentAmountCalculator
      * @param InterestAmountCalculatorInterface $interestAmountCalculator
-     * @param float|int $amountOfPrincipal
-     * @param float|int $yearlyInterestRate interest rate for 360 days
      */
     public function __construct(
-        PaymentPeriodsInterface $paymentPeriods,
         PaymentAmountCalculatorInterface $paymentAmountCalculator,
-        InterestAmountCalculatorInterface $interestAmountCalculator,
-        float $amountOfPrincipal,
-        float $yearlyInterestRate
+        InterestAmountCalculatorInterface $interestAmountCalculator
     ) {
-        $numberOfPayments = $paymentPeriods->getNoOfPeriods();
+        $this->paymentAmountCalculator = $paymentAmountCalculator;
+        $this->interestAmountCalculator = $interestAmountCalculator;
+    }
 
+    /**
+     * @param PaymentPeriodsInterface $paymentPeriods
+     * @param float $amountOfPrincipal
+     * @param float $yearlyInterestRate
+     * @param int $calculationMode
+     * @return array
+     */
+    public function getPayments(
+        PaymentPeriodsInterface $paymentPeriods,
+        float $amountOfPrincipal,
+        float $yearlyInterestRate,
+        int $calculationMode
+    ): array {
+        $payments = array();
+
+        $numberOfPayments = $paymentPeriods->getNoOfPeriods();
         $principalLeft = $amountOfPrincipal;
-        $calculationType = $paymentPeriods::CALCULATION_TYPE_ANNUITY;
 
         foreach ($paymentPeriods->getPeriods() as $key => $period) {
-            $ratePerPeriod = $paymentPeriods->getRatePerPeriod($period, $yearlyInterestRate, $calculationType);
-            $numberOfPeriods = $paymentPeriods->getNumberOfRemainingPeriods($period, $calculationType);
+            $ratePerPeriod = $paymentPeriods->getRatePerPeriod($period, $yearlyInterestRate, $calculationMode);
+            $numberOfPeriods = $paymentPeriods->getNumberOfRemainingPeriods($period, $calculationMode);
 
             /**
              * Calculate payment amount
              */
-            $paymentAmount = $paymentAmountCalculator->getPaymentAmount($principalLeft, $ratePerPeriod,
+            $paymentAmount = $this->paymentAmountCalculator->getPaymentAmount($principalLeft, $ratePerPeriod,
                 $numberOfPeriods);
 
             /**
              * Calculate interest part
              */
-            $interest = $interestAmountCalculator->getInterestAmount($principalLeft, $ratePerPeriod);
+            $interest = $this->interestAmountCalculator->getInterestAmount($principalLeft, $ratePerPeriod);
 
             /**
              * Calculate principal part
@@ -72,15 +87,9 @@ class PaymentsCalculator implements PaymentsCalculatorInterface
                 'period' => $period
             );
 
-            $this->payments[$key] = $paymentData;
+            $payments[$key] = $paymentData;
         }
-    }
 
-    /**
-     * @return array
-     */
-    public function getPayments(): array
-    {
-        return $this->payments;
+        return $payments;
     }
 }
