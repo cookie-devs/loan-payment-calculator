@@ -36,7 +36,7 @@ class PaymentsCalculator implements PaymentsCalculatorInterface
      * @param int $calculationMode
      * @return array
      */
-    public function getPayments(
+    public function calculatePayments(
         PaymentPeriodsInterface $paymentPeriods,
         float $amountOfPrincipal,
         float $yearlyInterestRate,
@@ -80,6 +80,7 @@ class PaymentsCalculator implements PaymentsCalculatorInterface
              * Compose payment data
              */
             $paymentData = array(
+                'sequence_no' => $key,
                 'payment' => $interest + $principal,
                 'principal' => $principal,
                 'interest' => $interest,

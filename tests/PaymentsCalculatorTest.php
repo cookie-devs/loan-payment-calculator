@@ -8,24 +8,23 @@ use Kauri\Loan\PaymentAmountCalculator\AnnuityPaymentAmountCalculator;
 use Kauri\Loan\PaymentAmountCalculator\EqualPrincipalPaymentAmountCalculator;
 use Kauri\Loan\PaymentAmountCalculatorInterface;
 use Kauri\Loan\PaymentPeriodsFactory;
+use Kauri\Loan\PaymentPeriodsInterface;
 use Kauri\Loan\PaymentsCalculator;
-use Kauri\Loan\PaymentDateCalculator;
 use Kauri\Loan\PaymentScheduleConfig;
 use Kauri\Loan\PaymentScheduleFactory;
-use Kauri\Loan\PeriodCalculator;
 use PHPUnit\Framework\TestCase;
 
 class PaymentsCalculatorTest extends TestCase
 {
     /**
      * @dataProvider loanData
-     * @param $noOfPayments
-     * @param $principal
-     * @param $interestRate
-     * @param $expectedPaymentAmount
+     * @param int $noOfPayments
+     * @param int $principal
+     * @param int $interestRate
+     * @param float $expectedPaymentAmount
      * @param PaymentAmountCalculatorInterface $paymentAmountCalculator
      */
-    public function testScheduler(
+    public function testCalculatePayments(
         $noOfPayments,
         $principal,
         $interestRate,
@@ -39,14 +38,17 @@ class PaymentsCalculatorTest extends TestCase
         $periods = PaymentPeriodsFactory::generate($schedule);
         $paymentsCalculator = new PaymentsCalculator($paymentAmountCalculator, $interestAmountCalculator);
 
-        $calculationMode = $periods::CALCULATION_MODE_AVERAGE;
+        $calculationMode = PaymentPeriodsInterface::CALCULATION_MODE_AVERAGE;
 
-        $payments = $paymentsCalculator->getPayments($periods, $principal, $interestRate, $calculationMode);
+        $payments = $paymentsCalculator->calculatePayments($periods, $principal, $interestRate, $calculationMode);
         $firstPayment = current($payments);
         $this->assertEquals($expectedPaymentAmount, $firstPayment['payment']);
     }
 
-    public function loanData()
+    /**
+     * @return array
+     */
+    public function loanData(): array
     {
         $annuityPaymentAmountCalculator = new AnnuityPaymentAmountCalculator();
         $equalPaymentAmountCalculator = new EqualPrincipalPaymentAmountCalculator();
