@@ -54,13 +54,13 @@ class PaymentsCalculator implements PaymentsCalculatorInterface
             /**
              * Calculate payment amount
              */
-            $paymentAmount = $this->paymentAmountCalculator->getPaymentAmount($principalLeft, $ratePerPeriod,
-                $numberOfPeriods);
+            $paymentAmount = round($this->paymentAmountCalculator->getPaymentAmount($principalLeft, $ratePerPeriod,
+                $numberOfPeriods), 2);
 
             /**
              * Calculate interest part
              */
-            $interest = $this->interestAmountCalculator->getInterestAmount($principalLeft, $ratePerPeriod);
+            $interest = round($this->interestAmountCalculator->getInterestAmount($principalLeft, $ratePerPeriod), 2);
 
             /**
              * Calculate principal part
@@ -74,7 +74,7 @@ class PaymentsCalculator implements PaymentsCalculatorInterface
             /**
              * Calculate balance left
              */
-            $principalLeft = round($principalLeft - $principal, 2);
+            $principalLeft = $principalLeft - $principal;
 
             /**
              * Compose payment data

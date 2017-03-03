@@ -57,6 +57,8 @@ class PaymentsCalculatorTest extends TestCase
             [2, 2500, 0, 1250, $annuityPaymentAmountCalculator],
             [1, 1000, 360, 1030, $annuityPaymentAmountCalculator],
             [3, 3000, 0, 1000, $equalPaymentAmountCalculator],
+            [3, 110, 0, 36.67, $equalPaymentAmountCalculator],
+            [3, 4000, 0, 1333.33, $equalPaymentAmountCalculator],
             [3, 3000, 360, 1090, $equalPaymentAmountCalculator]
         ];
     }
