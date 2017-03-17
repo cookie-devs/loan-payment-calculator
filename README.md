@@ -7,7 +7,7 @@ Library to calculate full loan payments (with dates, periods, principal and inte
 ## Basic usage
 
 ```php
-// $paymentAmountCalculator is insance of PaymentAmountCalculatorInterface
+// $paymentAmountCalculator is instance of PaymentAmountCalculatorInterface
 // $interestAmountCalculator is instance of InterestAmountCalculatorInterface
 $calculator = new PaymentsCalculator($paymentAmountCalculator, $interestAmountCalculator);
 
