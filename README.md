@@ -14,7 +14,7 @@ $calculator = new PaymentsCalculator($paymentAmountCalculator, $interestAmountCa
 $periods = $paymentPeriods; // must be instance of PaymentPeriodsInterface
 $principal = 2000;
 $interestRate = 20;
-$calculationMode = 1 // see PaymentPeriodsInterface for available modes
+$calculationMode = 1; // see PaymentPeriodsInterface for available modes
 
 $payments = $calculator->calculatePayments($periods, $principal, $interestRate, $calculationMode);
 ```
