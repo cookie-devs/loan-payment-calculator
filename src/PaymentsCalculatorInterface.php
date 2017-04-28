@@ -25,13 +25,14 @@ interface PaymentsCalculatorInterface
      * @param float $amountOfPrincipal
      * @param float $yearlyInterestRate
      * @param int $calculationMode
+     * @param float $futureValue
      * @return array
      */
     public function calculatePayments(
         PaymentPeriodsInterface $paymentPeriods,
         float $amountOfPrincipal,
         float $yearlyInterestRate,
-        int $calculationMode
+        int $calculationMode,
+        float $futureValue
     ): array;
-
 }
