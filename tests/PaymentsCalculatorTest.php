@@ -27,7 +27,7 @@ class PaymentsCalculatorTest extends TestCase
      * @param $calculationMode
      * @param array $expectedPaymentAmounts
      */
-    public function testCalculatePaymentsNew(
+    public function testCalculatePayments(
         $principal,
         $futureValue,
         $noOfPayments,
