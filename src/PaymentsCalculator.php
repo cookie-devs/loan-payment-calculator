@@ -48,7 +48,7 @@ class PaymentsCalculator implements PaymentsCalculatorInterface
 
         $periodLengths = $this->getPeriodLengths($paymentPeriods, $calculationMode);
         $paymentAmounts = $this->paymentAmountCalculator->getPaymentAmounts($periodLengths, $amountOfPrincipal,
-            $yearlyInterestRate, 0);
+            $yearlyInterestRate, $futureValue);
 
         $principalLeft = $amountOfPrincipal;
 
@@ -75,7 +75,7 @@ class PaymentsCalculator implements PaymentsCalculatorInterface
             if ($period->getSequenceNo() < $paymentPeriods->getNoOfPeriods()) {
                 $principal = $paymentAmount - $interest;
             } else {
-                $principal = $principalLeft;
+                $principal = $principalLeft - $futureValue;
             }
 
             /**

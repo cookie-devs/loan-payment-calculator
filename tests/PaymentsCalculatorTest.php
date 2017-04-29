@@ -89,6 +89,17 @@ class PaymentsCalculatorTest extends TestCase
                 $exactCalculationMode,
                 [1 => 2480.94, 2480.94, 2480.94, 2480.94, 2470.53]
             ],
+            // exact interest with future value
+            [
+                6000,
+                2000,
+                5,
+                360,
+                'P1M',
+                $annuityPaymentAmountCalculator,
+                $exactCalculationMode,
+                [1 => 2261.58, 2261.58, 2261.58, 2261.58, 2252.13]
+            ],
             /* Equal principal payments */
             // average interest
             [
@@ -100,6 +111,17 @@ class PaymentsCalculatorTest extends TestCase
                 $equalPaymentAmountCalculator,
                 $averageCalculationMode,
                 [1 => 3000, 2640, 2280, 1920, 1560]
+            ],
+            // average interest with future value
+            [
+                6000,
+                2000,
+                5,
+                360,
+                'P1M',
+                $equalPaymentAmountCalculator,
+                $averageCalculationMode,
+                [1 => 2600, 2360, 2120, 1880, 1640]
             ],
             // exact payment
             [
