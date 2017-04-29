@@ -61,7 +61,8 @@ class PaymentsCalculator implements PaymentsCalculatorInterface
             /**
              * Get interest rate for period
              */
-            $ratePerPeriod = $this->getPeriodInterestRate($yearlyInterestRate, $period->getLength($calculationMode));
+            $ratePerPeriod = $this->interestAmountCalculator->getPeriodInterestRate($yearlyInterestRate,
+                $period->getLength($calculationMode));
 
             /**
              * Calculate interest part
@@ -98,17 +99,6 @@ class PaymentsCalculator implements PaymentsCalculatorInterface
         }
 
         return $payments;
-
-    }
-
-    /**
-     * @param float $yearlyInterestRate
-     * @param float $periodLength
-     * @return float
-     */
-    private function getPeriodInterestRate(float $yearlyInterestRate, float $periodLength): float
-    {
-        return $yearlyInterestRate / 360 * $periodLength;
     }
 
     /**

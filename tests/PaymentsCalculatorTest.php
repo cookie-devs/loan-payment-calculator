@@ -19,6 +19,7 @@ class PaymentsCalculatorTest extends TestCase
     /**
      * @dataProvider dataLoader
      * @param $principal
+     * @param $futureValue
      * @param $noOfPayments
      * @param $interestRate
      * @param $pattern
@@ -43,21 +44,26 @@ class PaymentsCalculatorTest extends TestCase
         $periods = PaymentPeriodsFactory::generate($schedule);
         $paymentsCalculator = new PaymentsCalculator($paymentAmountCalculator, $interestAmountCalculator);
 
-        $payments = $paymentsCalculator->calculatePayments($periods, $principal, $interestRate, $calculationMode, $futureValue);
+        $payments = $paymentsCalculator->calculatePayments($periods, $principal, $interestRate, $calculationMode,
+            $futureValue);
 
         foreach ($payments as $k => $pmt) {
             $this->assertEquals($expectedPaymentAmounts[$k], $pmt['payment']);
         }
     }
 
+    /**
+     * @return array
+     */
     public function dataLoader(): array
     {
-        $annuityPaymentAmountCalculator = new AnnuityPaymentAmountCalculator();
-        $equalPaymentAmountCalculator = new EqualPrincipalPaymentAmountCalculator();
+        $interestAmountCalculator = new InterestAmountCalculator;
+
+        $annuityPaymentAmountCalculator = new AnnuityPaymentAmountCalculator($interestAmountCalculator);
+        $equalPaymentAmountCalculator = new EqualPrincipalPaymentAmountCalculator($interestAmountCalculator);
 
         $averageCalculationMode = PeriodInterface::LENGTH_MODE_AVG;
         $exactCalculationMode = PeriodInterface::LENGTH_MODE_EXACT;
-
 
         return [
             /* Annuity payments */
@@ -96,15 +102,16 @@ class PaymentsCalculatorTest extends TestCase
                 [1 => 3000, 2640, 2280, 1920, 1560]
             ],
             // exact payment
-            /*[
+            [
                 6000,
+                0,
                 5,
                 360,
                 'P1M',
                 $equalPaymentAmountCalculator,
                 $exactCalculationMode,
-                [3060, 2592, 2316, 1920, 1572]
-            ],*/
+                [1 => 3060, 2592, 2316, 1920, 1572]
+            ]
         ];
     }
 }

@@ -15,6 +15,7 @@ $periods = $paymentPeriods; // must be instance of PaymentPeriodsInterface
 $principal = 2000;
 $interestRate = 20;
 $calculationMode = 1; // see PaymentPeriodsInterface for available modes
+$futureValue = 0; // Expected value after loan end, usually 0 
 
-$payments = $calculator->calculatePayments($periods, $principal, $interestRate, $calculationMode);
+$payments = $calculator->calculatePayments($periods, $principal, $interestRate, $calculationMode, $futureValue);
 ```
