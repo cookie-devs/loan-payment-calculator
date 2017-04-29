@@ -34,28 +34,35 @@ class PaymentsCalculator implements PaymentsCalculatorInterface
      * @param float $amountOfPrincipal
      * @param float $yearlyInterestRate
      * @param int $calculationMode
+     * @param float $futureValue
      * @return array
      */
     public function calculatePayments(
         PaymentPeriodsInterface $paymentPeriods,
         float $amountOfPrincipal,
         float $yearlyInterestRate,
-        int $calculationMode
+        int $calculationMode,
+        float $futureValue
     ): array {
         $payments = array();
 
-        $numberOfPayments = $paymentPeriods->getNoOfPeriods();
+        $periodLengths = $this->getPeriodLengths($paymentPeriods, $calculationMode);
+        $paymentAmounts = $this->paymentAmountCalculator->getPaymentAmounts($periodLengths, $amountOfPrincipal,
+            $yearlyInterestRate, 0);
+
         $principalLeft = $amountOfPrincipal;
 
-        foreach ($paymentPeriods->getPeriods() as $key => $period) {
-            $ratePerPeriod = $paymentPeriods->getRatePerPeriod($period, $yearlyInterestRate, $calculationMode);
-            $numberOfPeriods = $paymentPeriods->getNumberOfRemainingPeriods($period, $calculationMode);
+        foreach ($paymentPeriods->getPeriods() as $period) {
+            /**
+             * Get payment amount
+             */
+            $paymentAmount = round($paymentAmounts[$period->getSequenceNo()], 2);
 
             /**
-             * Calculate payment amount
+             * Get interest rate for period
              */
-            $paymentAmount = round($this->paymentAmountCalculator->getPaymentAmount($principalLeft, $ratePerPeriod,
-                $numberOfPeriods), 2);
+            $ratePerPeriod = $this->interestAmountCalculator->getPeriodInterestRate($yearlyInterestRate,
+                $period->getLength($calculationMode));
 
             /**
              * Calculate interest part
@@ -65,7 +72,7 @@ class PaymentsCalculator implements PaymentsCalculatorInterface
             /**
              * Calculate principal part
              */
-            if ($key < $numberOfPayments) {
+            if ($period->getSequenceNo() < $paymentPeriods->getNoOfPeriods()) {
                 $principal = $paymentAmount - $interest;
             } else {
                 $principal = $principalLeft;
@@ -80,7 +87,7 @@ class PaymentsCalculator implements PaymentsCalculatorInterface
              * Compose payment data
              */
             $paymentData = array(
-                'sequence_no' => $key,
+                'sequence_no' => $period->getSequenceNo(),
                 'payment' => $interest + $principal,
                 'principal' => $principal,
                 'interest' => $interest,
@@ -88,9 +95,26 @@ class PaymentsCalculator implements PaymentsCalculatorInterface
                 'period' => $period
             );
 
-            $payments[$key] = $paymentData;
+            $payments[$period->getSequenceNo()] = $paymentData;
         }
 
         return $payments;
+    }
+
+    /**
+     * @param PaymentPeriodsInterface $paymentPeriods
+     * @param int $lengthMode
+     * @return array
+     */
+    private function getPeriodLengths(PaymentPeriodsInterface $paymentPeriods, int $lengthMode): array
+    {
+        $lengths = array();
+
+        /** @var PeriodInterface $period */
+        foreach ($paymentPeriods->getPeriods() as $period) {
+            $lengths[$period->getSequenceNo()] = $period->getLength($lengthMode);
+        }
+
+        return $lengths;
     }
 }

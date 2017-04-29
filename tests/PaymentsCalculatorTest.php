@@ -8,58 +8,110 @@ use Kauri\Loan\PaymentAmountCalculator\AnnuityPaymentAmountCalculator;
 use Kauri\Loan\PaymentAmountCalculator\EqualPrincipalPaymentAmountCalculator;
 use Kauri\Loan\PaymentAmountCalculatorInterface;
 use Kauri\Loan\PaymentPeriodsFactory;
-use Kauri\Loan\PaymentPeriodsInterface;
 use Kauri\Loan\PaymentsCalculator;
 use Kauri\Loan\PaymentScheduleConfig;
 use Kauri\Loan\PaymentScheduleFactory;
+use Kauri\Loan\PeriodInterface;
 use PHPUnit\Framework\TestCase;
 
 class PaymentsCalculatorTest extends TestCase
 {
     /**
-     * @dataProvider loanData
-     * @param int $noOfPayments
-     * @param int $principal
-     * @param int $interestRate
-     * @param float $expectedPaymentAmount
+     * @dataProvider dataLoader
+     * @param $principal
+     * @param $futureValue
+     * @param $noOfPayments
+     * @param $interestRate
+     * @param $pattern
      * @param PaymentAmountCalculatorInterface $paymentAmountCalculator
+     * @param $calculationMode
+     * @param array $expectedPaymentAmounts
      */
     public function testCalculatePayments(
-        $noOfPayments,
         $principal,
+        $futureValue,
+        $noOfPayments,
         $interestRate,
-        $expectedPaymentAmount,
-        PaymentAmountCalculatorInterface $paymentAmountCalculator
+        $pattern,
+        PaymentAmountCalculatorInterface $paymentAmountCalculator,
+        $calculationMode,
+        array $expectedPaymentAmounts
     ) {
         $interestAmountCalculator = new InterestAmountCalculator;
 
-        $config = new PaymentScheduleConfig($noOfPayments, new \DateTime(), 'P3D');
+        $config = new PaymentScheduleConfig($noOfPayments, new \DateTime("2016-01-01"), $pattern);
         $schedule = PaymentScheduleFactory::generate($config);
         $periods = PaymentPeriodsFactory::generate($schedule);
         $paymentsCalculator = new PaymentsCalculator($paymentAmountCalculator, $interestAmountCalculator);
 
-        $calculationMode = PaymentPeriodsInterface::CALCULATION_MODE_AVERAGE;
+        $payments = $paymentsCalculator->calculatePayments($periods, $principal, $interestRate, $calculationMode,
+            $futureValue);
 
-        $payments = $paymentsCalculator->calculatePayments($periods, $principal, $interestRate, $calculationMode);
-        $firstPayment = current($payments);
-        $this->assertEquals($expectedPaymentAmount, $firstPayment['payment']);
+        foreach ($payments as $k => $pmt) {
+            $this->assertEquals($expectedPaymentAmounts[$k], $pmt['payment']);
+        }
     }
 
     /**
      * @return array
      */
-    public function loanData(): array
+    public function dataLoader(): array
     {
-        $annuityPaymentAmountCalculator = new AnnuityPaymentAmountCalculator();
-        $equalPaymentAmountCalculator = new EqualPrincipalPaymentAmountCalculator();
+        $interestAmountCalculator = new InterestAmountCalculator;
+
+        $annuityPaymentAmountCalculator = new AnnuityPaymentAmountCalculator($interestAmountCalculator);
+        $equalPaymentAmountCalculator = new EqualPrincipalPaymentAmountCalculator($interestAmountCalculator);
+
+        $averageCalculationMode = PeriodInterface::LENGTH_MODE_AVG;
+        $exactCalculationMode = PeriodInterface::LENGTH_MODE_EXACT;
 
         return [
-            [2, 2500, 0, 1250, $annuityPaymentAmountCalculator],
-            [1, 1000, 360, 1030, $annuityPaymentAmountCalculator],
-            [3, 3000, 0, 1000, $equalPaymentAmountCalculator],
-            [3, 110, 0, 36.67, $equalPaymentAmountCalculator],
-            [3, 4000, 0, 1333.33, $equalPaymentAmountCalculator],
-            [3, 3000, 360, 1090, $equalPaymentAmountCalculator]
+            /* Annuity payments */
+            // average interest
+            [
+                6000,
+                0,
+                5,
+                360,
+                'P1M',
+                $annuityPaymentAmountCalculator,
+                $averageCalculationMode,
+                [1 => 2463.49, 2463.49, 2463.49, 2463.49, 2463.47]
+            ],
+            // exact interest
+            [
+                6000,
+                0,
+                5,
+                360,
+                'P1M',
+                $annuityPaymentAmountCalculator,
+                $exactCalculationMode,
+                [1 => 2480.94, 2480.94, 2480.94, 2480.94, 2470.53]
+            ],
+            /* Equal principal payments */
+            // average interest
+            [
+                6000,
+                0,
+                5,
+                360,
+                'P1M',
+                $equalPaymentAmountCalculator,
+                $averageCalculationMode,
+                [1 => 3000, 2640, 2280, 1920, 1560]
+            ],
+            // exact payment
+            [
+                6000,
+                0,
+                5,
+                360,
+                'P1M',
+                $equalPaymentAmountCalculator,
+                $exactCalculationMode,
+                [1 => 3060, 2592, 2316, 1920, 1572]
+            ]
         ];
     }
 }
