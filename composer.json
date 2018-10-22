@@ -19,11 +19,11 @@
     }
   },
   "require": {
-    "php": ">=7.1",
+    "php": ">=7.2",
     "kaurikk/loan-amount-calculator": ">=0.0",
     "kaurikk/loan-payment-period": ">=0.0"
   },
   "require-dev": {
-    "phpunit/phpunit": ">=6.0"
+    "phpunit/phpunit": ">=7.0"
   }
 }
