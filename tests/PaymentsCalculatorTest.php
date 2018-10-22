@@ -2,7 +2,6 @@
 
 namespace Kauri\Loan\Test;
 
-
 use Kauri\Loan\InterestAmountCalculator;
 use Kauri\Loan\PaymentAmountCalculator\AnnuityPaymentAmountCalculator;
 use Kauri\Loan\PaymentAmountCalculator\EqualPrincipalPaymentAmountCalculator;
